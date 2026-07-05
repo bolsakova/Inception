@@ -1,0 +1,11 @@
+# Secrets must never be pushed to Git
+secrets/*.txt
+
+# Local environment file
+srcs/.env
+
+# System files
+.DS_Store
+
+# Editor files
+.vscode/
