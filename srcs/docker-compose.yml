@@ -63,4 +63,13 @@ volumes:
       o: bind
 
 networks:
+  inception:
+    driver: bridge
+
 secrets:
+  db_password:
+    file: ../secrets/dp_password.txt
+  db_root_password:
+    file: ../secrets/dp_root_password.txt
+  wp_admin_password:
+    file: ../secrets/wp_admin_password.txt
