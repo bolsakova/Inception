@@ -1,11 +1,18 @@
-# Secrets must never be pushed to Git
+# Git ignore rules for Inception.
+# Sensitive files and local editor settings must not be committed.
+
+# Docker secrets contain passwords.
 secrets/*.txt
 
-# Local environment file
+# Local environment file.
+# It may contain personal login/domain configuration.
 srcs/.env
 
 # System files
 .DS_Store
 
-# Editor files
+# VS Code local settings.
 .vscode/
+
+# Log files.
+*.log
