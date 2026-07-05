@@ -1,0 +1,23 @@
+services:
+  nginx:
+    container_name: nginx
+    image: nginx
+    build:
+      context: ./requirements/nginx
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress_data:/var/www/html
+    depends_on:
+      - wordpress
+    networks:
+      - inception
+    restart: unless-stopped
+
+  wordpress:
+
+  mariadb:
+
+volumes:
+networks:
+secrets:
