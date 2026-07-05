@@ -49,5 +49,18 @@ services:
     restart: unless-stopped
 
 volumes:
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/${LOGIN}/data/wordpress
+      o: bind
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/${LOGIN}/data/mariadb
+      o: bind
+
 networks:
 secrets:
