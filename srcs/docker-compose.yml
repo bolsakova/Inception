@@ -15,6 +15,22 @@ services:
     restart: unless-stopped
 
   wordpress:
+    container_name: wordpress
+    image: wordpress
+    build:
+      context: ./requirements/wordpress
+    volumes:
+      - wordpress_data:/var/www/html
+    env_file:
+      - .env
+    secrets:
+      - db_password
+      - wp_admin_password
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+    restart: unless-stopped
 
   mariadb:
 
