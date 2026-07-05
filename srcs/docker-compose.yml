@@ -1,42 +1,72 @@
+# docker-compose.yml describes the whole Inception infrastructure.
+# It defines services, networks, volumes and secrets.
+
 services:
+  # NGINX is the only public entry point.
+  # It receives HTTPS traffic on port 443 and forwards PHP requests to WordPress.
   nginx:
     container_name: nginx
     image: nginx
     build:
       context: ./requirements/nginx
+    
+    # Format: HOST_PORT:CONTAINER_PORT
+    # Only NGINX is exposed to the host machine.
     ports:
       - "443:443"
+
+    # NGINX needs access to WordPress files to serve static files
+    # and pass PHP requests correctly.
     volumes:
       - wordpress_data:/var/www/html
+
+    # NGINX should start after WordPress container is started.
+    # Important: depends_on does not guarantee that WordPress is fully ready.
     depends_on:
       - wordpress
     networks:
       - inception
+
+    # Restart container if it crashes, unless we stopped it manually.
     restart: unless-stopped
 
+  # WordPress contains the PHP application and php-fpm.
+  # It doesn't expose any port to the host.
   wordpress:
     container_name: wordpress
     image: wordpress
     build:
       context: ./requirements/wordpress
+
+    # WordPress files must persist after container deletion.
     volumes:
       - wordpress_data:/var/www/html
+
+    # Non-secret configuration values are loaded from .env.
     env_file:
       - .env
+
+    # Passwords are provided as Docker secrets.
     secrets:
       - db_password
       - wp_admin_password
+
+    # WordPress needs MariaDB to store website data.
     depends_on:
       - mariadb
     networks:
       - inception
     restart: unless-stopped
 
+  # MariaDB stores the WordPress database.
+  # It is internal and not exposed to the host.
   mariadb:
     container_name: mariadb
     image: mariadb
     build:
       context: ./requirements/mariadb
+
+    # Database files must persist after container deletion.
     volumes:
       - mariadb_data:/var/www/html
     env_file:
@@ -48,6 +78,8 @@ services:
       - inception
     restart: unless-stopped
 
+# Docker named volumes.
+# They are managed by Docker, but physically stored in /home/<login>/data.
 volumes:
   wordpress_data:
     driver: local
@@ -62,10 +94,13 @@ volumes:
       device: /home/${LOGIN}/data/mariadb
       o: bind
 
+# Dedicated bridge network for internal communication between containers.
 networks:
   inception:
     driver: bridge
 
+# Secret files are stored outside srcs.
+# They must be ignored by Git.
 secrets:
   db_password:
     file: ../secrets/dp_password.txt
