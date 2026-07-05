@@ -33,6 +33,20 @@ services:
     restart: unless-stopped
 
   mariadb:
+    container_name: mariadb
+    image: mariadb
+    build:
+      context: ./requirements/mariadb
+    volumes:
+      - mariadb_data:/var/www/html
+    env_file:
+      - .env
+    secrets:
+      - db_password
+      - db_root_password
+    networks:
+      - inception
+    restart: unless-stopped
 
 volumes:
 networks:
