@@ -1,0 +1,6 @@
+# Ignore local/editor files during Docker build
+.git
+.gitignore
+.dockerignore
+*.log
+.vscode/
