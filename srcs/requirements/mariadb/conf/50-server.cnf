@@ -1,0 +1,15 @@
+# MariaDB server configuration
+
+[mysqld]
+# Listen on all interfaces inside Docker network.
+# This allows WordPress container to connect to MariaDB.
+bind-address = 0.0.0.0
+
+# Default MariaDB port
+port = 3306
+
+# Database files are stored in the Docker volume
+datadir = /var/lib/mysql
+
+# Run MariaDB as mysql user
+user = mysql
