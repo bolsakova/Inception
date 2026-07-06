@@ -1,37 +1,53 @@
-NAME = inception
+# Path to the Docker Compose file
+COMPOSE_FILE = srcs/docker-compose.yml
 
-CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++17
+# Path to the environment file
+ENV_FILE = srcs/.env
 
-FILES = main
+# Data directories required by the subject
+LOGIN = tbolsako
+DATA_DIR = /home/$(LOGIN)/data
+WORDPRESS_DIR = $(DATA_DIR)/wordpress
+MARIADB_DIR = $(DATA_DIR)/mariadb
 
-SRCDIR = srcs
+# Default target 
+all: up
 
-SRC = $(addsuffix .cpp, $(FILES))
+# Create required host directories for Docker named volumes
+# Then build and start containers in detached mode
+up:
+	mkdir -p $(WORDPRESS_DIR)
+	mkdir -p $(MARIADB_DIR)
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) up -d --build
 
-vpath %.cpp src
+# Stop containers without deleting them
+down:
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) down
 
-OBJDIR = obj
-OBJ = $(addprefix $(OBJDIR)/, $(SRC:.cpp=.o))
-
-all: $(NAME)
-
-$(NAME): $(OBJ)
-	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJ)
-
-$(OBJDIR)/%.o: %.cpp | $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -c -I inc $< -o $@
-
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
-
+# Stop and remove containers, networks and named volumes
+# This deletes persistent WordPress and MariaDB data from Docker's point of view.
 clean:
-	rm -f $(OBJDIR)/*.o
-	rm -rf $(OBJDIR)
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) down -v
 
+# Full cleanup
+# Stop project, remove volumes, remove local data directories
 fclean: clean
-	rm -rf $(NAME)
+	sudo rm -rf $(DATA_DIR)
 
+# Rebuild everything from scratch
 re: fclean all
 
-.PHONY: all clean fclean re
+# Show running containers for this project
+ps:
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) ps
+
+# Show logs from all services
+logs:
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) logs
+
+# Show logs and keep following new output
+logs-follow:
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) logs -f
+
+
+.PHONY: all up down clean fclean re ps logs logs-follow
