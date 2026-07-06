@@ -22,6 +22,9 @@ RUN apt-get update && \
 		mariadb-client && \
 	rm -rf /var/lib/apt/lists/*
 
+# Custom MariaDB configuration.
+COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+
 # Copy the startup script into the image.
 COPY tools/setup.sh /usr/local/bin/setup.sh
 
