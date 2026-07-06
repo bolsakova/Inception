@@ -1,11 +1,7 @@
 #!/bin/bash
 
-# ***************************************************************
-# 
-# Downloads and configures MariaDB on the first container start.
+# Downloads and configures WordPress on the first container start.
 # Then starts php-fpm as the main foreground process.
-#
-# ***************************************************************
 
 set -e
 
@@ -17,13 +13,7 @@ DB_PASSWORD="$(cat /run/secrets/db_password)"
 # WordPress administrator password.
 WP_ADMIN_PASSWORD="$(cat /run/secrets/wp_admin_password)"
 
-# 2. Prepare php-fpm configuration
-# Debian's default php-fpm pool often listens on a Unix socket.
-# NGINX is in another container, so it cannot use that local socket.
-# We configure php-fpm to listen on TCP port 9000 instead.
-sed -i 's|listen = /run/php/php.*-fpm.sock|listen = 0.0.0.0:9000|' /etc/php/*/fpm/pool.d/www.conf
-
-# 3. Wait for MariaDB
+# 2. Wait for MariaDB
 echo "Waiting for MariaDB..."
 
 # depends_on only starts the MariaDB container.
@@ -39,7 +29,7 @@ done
 
 echo "MariaDB is ready."
 
-# 4. Install WordPress only on the first run
+# 3. Install WordPress only on the first run
 cd /var/www/html
 
 # wp-config.php is created during WordPress installation.
@@ -87,7 +77,7 @@ if [ ! -f "wp-config.php" ]; then
         --allow-root
 fi
 
-# 5. Start php-fpm as the main process
+# 4. Start php-fpm as the main process
 echo "Starting php-fpm..."
 
 # Create runtime directory required by php-fpm.
