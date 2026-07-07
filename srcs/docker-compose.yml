@@ -9,6 +9,9 @@ services:
     image: nginx
     build:
       context: ./requirements/nginx
+
+    env_file:
+      - .env
     
     # Format: HOST_PORT:CONTAINER_PORT
     # Only NGINX is exposed to the host machine.
