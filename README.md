@@ -60,6 +60,19 @@ The services communicate through a dedicated Docker bridge network and store per
 
 ---
 
+## Features
+
+- Custom Docker images built from Debian
+- NGINX configured with TLS 1.2 / TLS 1.3
+- WordPress running with php-fpm
+- MariaDB database
+- Docker named volumes for persistent storage
+- Dedicated Docker bridge network
+- Docker Secrets for sensitive credentials
+- Automatic initialization scripts
+
+---
+
 ## Instructions
 
 1. Build and start the infrastructure:
@@ -91,3 +104,67 @@ The services communicate through a dedicated Docker bridge network and store per
 ```bash
 	make re
 ```
+
+---
+
+## Project Design Choices
+
+### Virtual Machines vs Docker
+
+A virtual machine emulates an entire operating system with its own kernel. This approach provides strong isolation but requires significantly more memory and storage.
+
+Docker containers, on the other hand, share the host Linux kernel while isolating processes, file systems and networks. As a result, containers start much faster and consume considerably fewer resources.
+
+### Secrets vs Environment Variables
+
+Environment variables are used for non-sensitive configuration such as domain names or usernames.
+
+Passwords are stored separately using Docker Secrets, allowing containers to read sensitive information from mounted files instead of embedding credentials directly into Dockerfiles or configuration files.
+
+### Docker Network vs Host Network
+
+The project uses a dedicated Docker bridge network.
+
+This allows the containers to communicate using Docker's built-in DNS while remaining isolated from the host network. The `host` network node is intentionally avoided because it removes this isolation and is forbidden by the project requirements.
+
+### Docker Volumes vs Bind Mounts
+
+Docker named volumes are used to provide persistent storage for both the WordPress files and the MariaDB database.
+
+Unlike bind mounts, Docker volumes are managed by Docker itself, making them easier to migrate, safer to use and better suited for long-term persistent application data.
+
+---
+
+## Technologies
+
+- Docker
+- Docker Compose
+- Debian 12
+- NGINX
+- WordPress
+- PHP-FPM
+- MariaDB
+- OpenSSL
+
+---
+
+## Resources
+
+The following resources were used during the development of tis project:
+
+- Docker Documentation
+- Docker Compose Documentation
+- NGINX Documentation
+- MariaDB Documentation
+- WordPress CLI Documentation
+- PHP-FPM Documentation
+
+---
+
+## AI Usage
+
+AI was used for:
+- explaining Docker concepts
+- reviewing configuration files
+- clarifying system administration topics
+- improving documentation (structure and language)
