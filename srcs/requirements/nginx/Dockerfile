@@ -20,20 +20,12 @@ RUN apt-get update && \
 # Copy custom NGINX configuration.
 COPY conf/nginx.conf /etc/nginx/sites-available/default
 
-# Create directory for TLS certificate and key.
-RUN mkdir -p /etx/nginx/ssl
+# Copy startup script.
+COPY tools/setup.sh /usr/local/bin/setup.sh
 
-# Generate a self-signed certificate for local HTTPS.
-# This is acceptable for a local 42 project
-RUN openssl req -x509 -nodes -days 365 \
-	-newkey rsa:2048 \
-	-keyout /etc/nginx/ssl/inception.key \
-	-out /etc/nginx/ssl/inception.crt \
-	-subj "/C=DE/ST=Baden-Wuerttemberg/L=Heilbronn/O=42/OU=Inception/CN=tbolsako.42.fr"
+RUN chmod +x /usr/local/bin/setup.sh
 
 # NGINX listens on HTTPS port 443.
 EXPOSE 443
 
-# Start NGINX in the foreground.
-# daemon off is required so the container keeps running.
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/usr/local/bin/setup.sh"]
